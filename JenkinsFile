@@ -9,8 +9,8 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/devops5014/sample-webapp.git',
-                        credentialsId: 'github-pass'
+                        url: 'https://github.com/rak134/sampleapp.git',
+                        credentialsId: 'github-token'
                     ]]
                 ])
             }
@@ -37,7 +37,7 @@ pipeline {
         stage("Deploy To Artifactory") {
             agent { label 'Slave' }
             steps {
-                configFileProvider([configFile(fileId: 'd583ab88-2c36-49aa-b582-49c2b6cc4d05', variable: 'MAVEN_SETTINGS')]) {
+                configFileProvider([configFile(fileId: '387c313c-9cde-4dae-bcd4-74214b88e591', variable: 'MAVEN_SETTINGS')]) {
                     sh '''
                     mvn deploy -s $MAVEN_SETTINGS
                     '''
