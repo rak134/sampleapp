@@ -1,7 +1,8 @@
 pipeline {
-    agent { label 'Slave' }
+    agent none
     stages {
         stage("Checkout Code") {
+            agent { label 'Slave' }
             steps {
                 checkout([
                         $class: 'GitSCM',
@@ -13,21 +14,27 @@ pipeline {
                 ])
             }
         }
-        stage("Build") {
-            steps {
-                sh '''
-                mvn clean install
-                '''
-            }
-        }
-        stage("Test") {
-            steps {
-                sh '''
-                mvn test
-                '''
+        stage("Build and Test") {
+            agent { label 'Master' }
+            parallel {
+                stage("Build") {
+                    steps {
+                        sh '''
+                        mvn clean install
+                        '''
+                    }
+                }
+                stage("Test") {
+                    steps {
+                        sh '''
+                        mvn test
+                        '''
+                    }
+                }
             }
         }
         stage("Deploy To Artifactory") {
+            agent { label 'Slave' }
             steps {
                 configFileProvider([configFile(fileId: '387c313c-9cde-4dae-bcd4-74214b88e591', variable: 'MAVEN_SETTINGS')]) {
                     sh '''
