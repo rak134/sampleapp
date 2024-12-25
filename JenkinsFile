@@ -1,0 +1,40 @@
+pipeline {
+    agent { label 'Slave' }
+    stages {
+        stage("Checkout Code") {
+            steps {
+                checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: '*/main']],
+                        userRemoteConfigs: [[
+                                                    url: 'https://github.com/devops5014/sample-webapp.git',
+                                                    credentialsId: 'github-pass'
+                                            ]]
+                ])
+            }
+        }
+        stage("Build") {
+            steps {
+                sh '''
+                mvn clean install
+                '''
+            }
+        }
+        stage("Test") {
+            steps {
+                sh '''
+                mvn test
+                '''
+            }
+        }
+        stage("Deploy To Artifactory") {
+            steps {
+                configFileProvider([configFile(fileId: 'd583ab88-2c36-49aa-b582-49c2b6cc4d05', variable: 'MAVEN_SETTINGS')]) {
+                    sh '''
+                    mvn deploy -s $MAVEN_SETTINGS
+                    '''
+                }
+            }
+        }
+    }
+}
