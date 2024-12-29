@@ -50,7 +50,7 @@
         <url>http://13.126.100.71:8081/artifactory/libs-snapshot-local</url>
     </snapshotRepository>
 </distributionManagement>
-
+         
     <build>
         <finalName>sample-webapp</finalName>
         <plugins>
